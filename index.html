@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f7f2">
+<meta name="description" content="Fydz AI — chat dengan berbagai model AI pilihan.">
+<title>Fydz AI — by Fydz Official</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #fbf9f5;
+  --panel: #ffffff;
+  --ink: #18181b;
+  --muted: #52525b;
+  --line: #18181b;
+  --accent: #ff7043; /* Oranye khas AllHub */
+  --accent-hover: #f4511e;
+  --accent-light: #ffccbc;
+  --lime: #c7f36b;
+  --purple: #d9ccff;
+  --blue: #c8e8ff;
+  --green: #37e8b0;
+  --shadow: 4px 4px 0 var(--ink);
+  --shadow-sm: 2px 2px 0 var(--ink);
+  --r: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--paper); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, color 0.3s ease; }
+button, textarea, select { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 270px minmax(0,1fr);
+  max-width: 1500px;
+  margin: auto;
+}
+
+/* Sidebar */
+.sidebar {
+  border-right: 3px solid var(--ink);
+  padding: 22px 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--panel);
+  box-shadow: inset -3px 0px 0px rgba(0,0,0,0.02);
+}
+
+.brand { display: flex; align-items: center; gap: 11px; }
+.brandmark {
+  width: 42px; height: 42px;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+  display: grid; place-items: center;
+  font-size: 20px; font-weight: 900;
+}
+.brandname { font-weight: 950; font-size: 18px; letter-spacing: -0.5px; }
+.brandby { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+.newchat {
+  width: 100%; padding: 12px;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+  font-size: 13px; font-weight: 900;
+  text-align: left;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.newchat:active, .send:active, .clear:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.label {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  font-weight: 900; color: var(--muted); margin: 0 0 8px 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.model-list { display: grid; gap: 7px; }
+.model {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left; padding: 9px;
+  border: 2px solid transparent; border-radius: 12px;
+  background: transparent; color: var(--ink);
+  font-weight: 700;
+}
+.model:hover { background: var(--bg, #f4f4f5); border-color: var(--ink); transform: translateY(-1px); }
+.model.active { background: var(--accent-light); border: 2px solid var(--ink); box-shadow: var(--shadow-sm); font-weight: 900; }
+
+.iconbox {
+  width: 34px; height: 34px; flex-shrink: 0;
+  display: grid; place-items: center;
+  border: 2px solid var(--ink); border-radius: 10px;
+  background: white; font-size: 11px; font-weight: 900;
+}
+.model-title { font-size: 12px; font-weight: 900; }
+.model-sub { font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600; }
+
+.side-bottom {
+  margin-top: auto; border-top: 2px dashed var(--ink); padding-top: 15px; display: grid; gap: 8px;
+}
+.side-link { font-size: 11px; color: var(--muted); font-weight: 800; padding: 6px 4px; }
+.side-link:hover { color: var(--ink); text-decoration: underline; }
+
+/* Main Area */
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 100dvh; }
+
+.topbar {
+  height: 70px; border-bottom: 3px solid var(--ink);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 0 27px; background: var(--panel);
+  position: sticky; top: 0; z-index: 3;
+}
+.top-model { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+.top-model small { display: block; color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 2px; }
+
+.top-actions { display: flex; align-items: center; gap: 10px; }
+.pill-online {
+  border: 2px solid var(--ink); border-radius: 30px;
+  padding: 6px 12px; font-size: 10px; font-weight: 900;
+  background: var(--green); color: #000; white-space: nowrap;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 5px;
+}
+.online-dot { width: 6px; height: 6px; background: #000; border-radius: 50%; }
+
+.btn-theme {
+  border: 2px solid var(--ink); border-radius: 30px;
+  padding: 6px 12px; font-size: 10px; font-weight: 900;
+  background: var(--panel); color: var(--ink); cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+}
+.btn-theme:active { transform: translate(1px, 1px); box-shadow: none; }
+
+.mobile-brand { display: none; }
+
+.chat-wrap { width: min(850px, 100%); margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 28px 28px 20px; }
+.chat { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-bottom: 22px; }
+
+.welcome { margin: auto; text-align: center; max-width: 520px; padding: 30px 0; }
+.welcome-icon {
+  width: 70px; height: 70px; border: 2.5px solid var(--ink);
+  border-radius: 20px; background: var(--accent); color: #fff;
+  box-shadow: var(--shadow); display: grid; place-items: center;
+  font-size: 32px; margin: 0 auto 23px; transform: rotate(-3deg);
+}
+.welcome h1 { font-size: clamp(28px, 4vw, 42px); line-height: 1.1; letter-spacing: -1.5px; margin: 0 0 14px; font-weight: 950; }
+.welcome h1 span { background: var(--accent-light); padding: 0 6px; border-radius: 6px; }
+.welcome p { color: var(--muted); font-size: 13px; line-height: 1.7; max-width: 380px; margin: auto; font-weight: 600; }
+
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 28px; text-align: left; }
+.suggestion {
+  border: 2px solid var(--ink); border-radius: 14px; background: var(--panel);
+  padding: 12px; font-size: 12px; font-weight: 800; box-shadow: var(--shadow-sm); line-height: 1.4;
+}
+.suggestion:hover { background: var(--accent-light); transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+.suggestion { transition: transform 0.15s, box-shadow 0.15s, background 0.15s; }
+.suggestion span { display: block; font-size: 10px; color: var(--muted); font-weight: 700; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+/* Messages */
+.msg { display: flex; align-items: flex-start; gap: 11px; max-width: 100%; animation: appear 0.18s ease-out; }
+.msg.user { flex-direction: row-reverse; }
+.avatar {
+  width: 32px; height: 32px; flex: 0 0 32px;
+  border: 2px solid var(--ink); border-radius: 10px;
+  display: grid; place-items: center; background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 900; box-shadow: 2px 2px 0 var(--ink);
+}
+.msg.user .avatar { background: var(--purple); color: #000; }
+.msgbody { max-width: min(680px, calc(100% - 43px)); min-width: 0; }
+.msgname { font-size: 10px; font-weight: 900; color: var(--muted); margin: 0 0 5px 2px; font-family: 'JetBrains Mono', monospace; }
+.msg.user .msgname { text-align: right; }
+
+.bubble {
+  border: 2.5px solid var(--ink); border-radius: 6px 16px 16px 16px;
+  background: var(--panel); padding: 13px 15px; font-size: 13px; line-height: 1.7;
+  white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: var(--shadow-sm); font-weight: 600;
+}
+.msg.user .bubble { background: var(--accent-light); border-radius: 16px 6px 16px 16px; font-weight: 700; }
+.bubble.error { background: #ffe1dc; }
+
+.typing { display: inline-flex; gap: 4px; align-items: center; }
+.typing i { width: 5px; height: 5px; background: var(--ink); border-radius: 50%; animation: blink 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; }
+.typing i:nth-child(3) { animation-delay: .3s; }
+
+/* Composer */
+.composer-area { position: sticky; bottom: 0; background: linear-gradient(0deg, var(--paper) 85%, transparent); padding: 14px 0 4px; }
+.composer {
+  border: 3px solid var(--ink); border-radius: 18px; background: var(--panel);
+  box-shadow: var(--shadow); padding: 10px;
+}
+.composer-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px 8px; border-bottom: 1.5px dashed var(--line); margin-bottom: 6px; }
+.current-model { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 900; }
+.current-model .mini-dot { width: 8px; height: 8px; border: 2px solid var(--ink); border-radius: 50%; background: var(--accent); box-shadow: 1px 1px 0 var(--ink); }
+
+.clear {
+  border: 2px solid var(--ink); border-radius: 8px; background: var(--panel);
+  color: var(--ink); font-size: 10px; font-weight: 900; padding: 5px 9px; box-shadow: 2px 2px 0 var(--ink);
+}
+.clear:hover { background: #ffe1dc; }
+
+.inputrow { display: flex; align-items: flex-end; gap: 8px; }
+.prompt {
+  resize: none; min-height: 42px; max-height: 170px; flex: 1; width: 100%;
+  border: 0; outline: none; padding: 8px; background: transparent; color: var(--ink);
+  font-size: 13px; line-height: 1.55; font-weight: 700;
+}
+.prompt::placeholder { color: var(--muted); opacity: 0.7; }
+
+.send {
+  border: 2.5px solid var(--ink); border-radius: 12px; background: var(--accent); color: #fff;
+  box-shadow: var(--shadow-sm); padding: 10px 16px; font-size: 12px; font-weight: 950; white-space: nowrap;
+}
+.send:disabled { opacity: .6; cursor: wait; }
+.send:hover:not(:disabled) { background: var(--accent-hover); }
+
+.hint { text-align: center; font-size: 10px; color: var(--muted); margin: 10px 0 0; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.foot { text-align: center; font-size: 10px; color: var(--muted); padding: 12px 0 0; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.foot a { font-weight: 900; color: var(--ink); text-decoration: underline; }
+
+.mobile-models { display: none; }
+
+/* MODAL TEMA CUSTOMIZER */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-card {
+  background: var(--panel); border: 3.5px solid var(--ink);
+  box-shadow: 8px 8px 0px var(--ink); border-radius: 20px;
+  padding: 24px; width: 100%; max-width: 420px;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px dashed var(--ink); }
+.modal-title { font-size: 15px; font-weight: 950; }
+.btn-close { background: #f87171; border: 2px solid var(--ink); width: 28px; height: 28px; border-radius: 8px; font-weight: 950; box-shadow: 2px 2px 0 var(--ink); }
+
+.theme-group { margin-bottom: 14px; }
+.theme-label { font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; display: block; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.color-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.color-swatch { height: 32px; border-radius: 8px; border: 2px solid var(--ink); cursor: pointer; box-shadow: 2px 2px 0 var(--ink); transition: transform 0.1s; }
+.color-swatch:hover { transform: scale(1.1); }
+
+@keyframes appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes blink { 0%,70%,100% { opacity: .25; transform: translateY(0); } 35% { opacity: 1; transform: translateY(-3px); } }
+
+@media(max-width:760px){
+  .app { display: flex; flex-direction: column; min-height: 100dvh; }
+  .sidebar { display: none; }
+  .topbar { height: 60px; padding: 0 14px; gap: 8px; }
+  .mobile-brand { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 950; }
+  .mobile-brand .brandmark { width: 30px; height: 30px; font-size: 15px; border-radius: 8px; }
+  .top-model { display: none; }
+  .mobile-models { display: flex; gap: 7px; padding: 10px 13px; overflow-x: auto; border-bottom: 2px solid var(--ink); background: var(--panel); }
+  .mobile-models .model { flex: 0 0 auto; width: auto; padding: 6px 10px; border: 2px solid var(--ink); background: white; box-shadow: 2px 2px 0 var(--ink); gap: 6px; }
+  .mobile-models .model.active { background: var(--accent-light); }
+  .mobile-models .iconbox { width: 24px; height: 24px; border-radius: 6px; font-size: 9px; }
+  .mobile-models .model-sub { display: none; }
+  .mobile-models .model-title { white-space: nowrap; font-size: 11px; }
+  .chat-wrap { padding: 18px 13px 12px; }
+  .composer { border-radius: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brandmark">F</span><span><span class="brandname">Fydz AI</span><span class="brandby">by Fydz Official</span></span></a>
+    <button class="newchat" id="newChat">＋ &nbsp; Chat baru</button>
+    <section><p class="label">Model percakapan</p><div class="model-list" id="sideModels"></div></section>
+    <div class="side-bottom">
+      <a class="side-link" href="https://fydzz-official.my.id" target="_blank" rel="noopener">↗ Portfolio Fydz Official</a>
+      <a class="side-link" href="https://github.com/FydzHosting" target="_blank" rel="noopener">↗ GitHub / FydzHosting</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <a href="#" class="mobile-brand"><span class="brandmark">F</span> Fydz AI</a>
+      <div class="top-model">
+        <span class="iconbox" id="topIcon">GF</span>
+        <span><span id="topName">GPT Free</span><small>Chat assistant</small></span>
+      </div>
+      <div class="top-actions">
+        <span class="pill-online"><div class="online-dot"></div> ONLINE</span>
+        <button class="btn-theme" id="openThemeBtn" type="button">🎨 TEMA</button>
+      </div>
+    </header>
+
+    <nav class="mobile-models" id="mobileModels" aria-label="Pilih model"></nav>
+
+    <div class="chat-wrap">
+      <section class="chat" id="chat">
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">✳</div>
+          <h1>Halo, mau bahas<br><span>apa hari ini?</span></h1>
+          <p>Tempat ngobrol, cari ide, tanya apa saja, atau bantu pecahin masalah. Pilih AI favorit lo dan mulai chat.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="Bantu gw belajar JavaScript dari dasar dengan contoh sederhana.">⌘ Belajar coding<span>Jelasin dengan contoh</span></button>
+            <button class="suggestion" data-prompt="Kasih gw ide project website yang keren dan realistis buat pemula.">✳ Cari ide project<span>Mulai dari ide sampai rencana</span></button>
+            <button class="suggestion" data-prompt="Jelasin topik yang lagi gw pelajari dengan bahasa santai dan gampang dimengerti.">◉ Tanya apa saja<span>Jawaban simpel dan jelas</span></button>
+            <button class="suggestion" data-prompt="Bantu gw menyusun rencana belajar teknologi selama 30 hari.">↗ Bikin rencana<span>Belajar langkah demi langkah</span></button>
+          </div>
+        </div>
+      </section>
+
+      <div class="composer-area">
+        <form class="composer" id="form">
+          <div class="composer-top">
+            <span class="current-model"><span class="mini-dot"></span> Ngobrol dengan <strong id="composerModel">GPT Free</strong></span>
+            <button type="button" class="clear" id="clear">↻ Chat baru</button>
+          </div>
+          <div class="inputrow">
+            <textarea class="prompt" id="prompt" rows="1" placeholder="Tulis pesan lo..." required></textarea>
+            <button class="send" id="send" type="submit">Kirim ↑</button>
+          </div>
+        </form>
+        <p class="hint">Enter untuk kirim · Shift + Enter untuk baris baru</p>
+        <footer class="foot">Dibuat oleh <a href="https://fydzz-official.my.id" target="_blank" rel="noopener">Fydz Official</a> · <a href="https://github.com/FydzHosting" target="_blank" rel="noopener">GitHub</a></footer>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Kustomisasi Tema -->
+<div class="modal-overlay" id="themeModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">🎨 Kustomisasi Tampilan Fydz AI</div>
+      <button class="btn-close" id="closeThemeBtn">✕</button>
+    </div>
+    <div class="theme-group">
+      <span class="theme-label">Warna Background Utama:</span>
+      <div class="color-picker-grid">
+        <div class="color-swatch" style="background: #fbf9f5;" onclick="setBg('#fbf9f5', '#ffffff', '#18181b', '#52525b')" title="Cream Classic"></div>
+        <div class="color-swatch" style="background: #ffffff;" onclick="setBg('#ffffff', '#f1f5f9', '#0f172a', '#64748b')" title="Pure White"></div>
+        <div class="color-swatch" style="background: #18181b;" onclick="setBg('#18181b', '#27272a', '#f4f4f5', '#a1a1aa')" title="Dark Mode"></div>
+        <div class="color-swatch" style="background: #fdf2f8;" onclick="setBg('#fdf2f8', '#ffffff', '#831843', '#9d174d')" title="Soft Pink"></div>
+        <div class="color-swatch" style="background: #fefce8;" onclick="setBg('#fefce8', '#ffffff', '#713f12', '#854d0e')" title="Warm Yellow"></div>
+        <div class="color-swatch" style="background: #fef2f2;" onclick="setBg('#fef2f2', '#ffffff', '#7f1d1d', '#991b1b')" title="Light Red"></div>
+      </div>
+    </div>
+    <div class="theme-group">
+      <span class="theme-label">Warna Aksen & Tombol:</span>
+      <div class="color-picker-grid">
+        <div class="color-swatch" style="background: #ff7043;" onclick="setAccent('#ff7043', '#f4511e', '#ffccbc')" title="AllHub Orange"></div>
+        <div class="color-swatch" style="background: #2563eb;" onclick="setAccent('#2563eb', '#1d4ed8', '#dbeafe')" title="Royal Blue"></div>
+        <div class="color-swatch" style="background: #10b981;" onclick="setAccent('#10b981', '#059669', '#d1fae5')" title="Cyber Green"></div>
+        <div class="color-swatch" style="background: #8b5cf6;" onclick="setAccent('#8b5cf6', '#7c3aed', '#ede9fe')" title="Neon Purple"></div>
+        <div class="color-swatch" style="background: #dc2626;" onclick="setAccent('#dc2626', '#b91c1c', '#fee2e2')" title="Bold Red"></div>
+        <div class="color-swatch" style="background: #78350f;" onclick="setAccent('#78350f', '#451a03', '#fef3c7')" title="Coffee Brown"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE='https://api.azbry.com';
+const models=[
+ {id:'gptfree',name:'GPT Free',icon:'GF',path:'/api/ai/gptfree',desc:'General chat'},
+ {id:'gpt4o',name:'GPT-4o',icon:'4o',path:'/api/ai/gpt4o',desc:'General chat'},
+ {id:'qwen',name:'Qwen',icon:'QW',path:'/api/ai/qwen',desc:'General chat'},
+ {id:'claude',name:'Claude',icon:'CL',path:'/api/ai/claude',desc:'General chat'},
+ {id:'ustadz',name:'Ustadz AI',icon:'UA',path:'/api/ai/ustadz',desc:'General chat'},
+ {id:'pollinations',name:'Pollinations',icon:'PL',path:'/api/ai/pollinations',desc:'General chat'}
+];let active='gptfree',busy=false;const $=id=>document.getElementById(id);
+
+// Script Modal Tema
+const modal = $('themeModal');
+$('openThemeBtn').onclick = () => modal.style.display = 'flex';
+$('closeThemeBtn').onclick = () => modal.style.display = 'none';
+modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+function setBg(bg, panel, text, muted) {
+  document.documentElement.style.setProperty('--paper', bg);
+  document.documentElement.style.setProperty('--panel', panel);
+  document.documentElement.style.setProperty('--ink', text);
+  document.documentElement.style.setProperty('--muted', muted);
+}
+
+function setAccent(accent, hover, light) {
+  document.documentElement.style.setProperty('--accent', accent);
+  document.documentElement.style.setProperty('--accent-hover', hover);
+  document.documentElement.style.setProperty('--accent-light', light);
+}
+
+function render(){const html=models.map(m=>`<button type="button" class="model ${m.id===active?'active':''}" data-model="${m.id}"><span class="iconbox">${m.icon}</span><span><span class="model-title">${m.name}</span><span class="model-sub">${m.desc}</span></span></button>`).join('');$('sideModels').innerHTML=html;$('mobileModels').innerHTML=html;const m=models.find(x=>x.id===active);$('topIcon').textContent=m.icon;$('topName').textContent=m.name;$('composerModel').textContent=m.name;document.querySelectorAll('[data-model]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.model)));}
+function choose(id){active=id;render()}
+function addMessage(text,who='ai',loading=false){$('welcome')?.remove();const row=document.createElement('article');row.className='msg '+(who==='user'?'user':'');const av=document.createElement('div');av.className='avatar';av.textContent=who==='user'?'LO':'AI';const body=document.createElement('div');body.className='msgbody';const name=document.createElement('div');name.className='msgname';name.textContent=who==='user'?'LO':models.find(m=>m.id===active).name;const bubble=document.createElement('div');bubble.className='bubble';if(loading){bubble.innerHTML='Sedang menyiapkan jawaban <span class="typing"><i></i><i></i><i></i></span>'}else bubble.textContent=text;body.append(name,bubble);row.append(av,body);$('chat').append(row);row.scrollIntoView({block:'nearest',behavior:'smooth'});return bubble;}
+function extract(d){if(typeof d==='string')return d;if(d==null)return 'API mengembalikan respons kosong.';if(typeof d!=='object')return String(d);for(const k of ['answer','response','result','message','text','content','output','generated_text']){if(d[k]!==undefined){const v=d[k];if(typeof v==='string')return v;if(v&&typeof v==='object'){const r=extract(v);if(r!=='Respons API tidak dikenali.')return r}}}if(Array.isArray(d.choices)&&d.choices[0])return extract(d.choices[0].message?.content??d.choices[0].text);return 'Respons API tidak dikenali. Data mentah:\n'+JSON.stringify(d,null,2)}
+async function sendMessage(raw){const q=raw.trim();if(!q||busy)return;addMessage(q,'user');$('prompt').value='';$('prompt').style.height='auto';busy=true;$('send').disabled=true;$('send').textContent='…';const m=models.find(x=>x.id===active);const bubble=addMessage('', 'ai',true);try{const identity='Identitas: Kamu adalah '+m.name+', model AI yang sedang dipilih di aplikasi Fydz AI. Jika pengguna bertanya nama atau identitasmu, jawab dengan nama '+m.name+'. Jangan mengaku sebagai model AI lain dan jangan mengganti identitas dengan ChatGPT, DeepAI, atau model lain. Tetap jawab pertanyaan pengguna secara langsung dalam bahasa yang sesuai.\n\nPesan pengguna: '+q;const url=BASE+m.path+'?q='+encodeURIComponent(identity);const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),45000);let res;try{res=await fetch(url,{method:'GET',headers:{Accept:'application/json, text/plain, */*'},signal:controller.signal})}finally{clearTimeout(timer)}const rawBody=await res.text();let data;try{data=JSON.parse(rawBody)}catch{data=rawBody}if(!res.ok){let msg=extract(data);throw new Error('HTTP '+res.status+(msg?' — '+msg:''))}const answer=extract(data);bubble.textContent=answer;$('topName').textContent=m.name;}catch(e){bubble.classList.add('error');if(e.name==='AbortError')bubble.textContent='Request melewati batas waktu. Coba kirim ulang.';else if(e instanceof TypeError)bubble.textContent='Koneksi API gagal dari browser. Ini bisa terjadi jika server API sedang bermasalah atau akses browser dibatasi (CORS). Detail: '+e.message;else bubble.textContent='API mengembalikan error: '+e.message;$('topName').textContent=m.name;}finally{busy=false;$('send').disabled=false;$('send').textContent='Kirim ↑';$('prompt').focus();}}
+$('form').addEventListener('submit',e=>{e.preventDefault();sendMessage($('prompt').value)});$('prompt').addEventListener('input',()=>{const t=$('prompt');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,170)+'px'});$('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('form').requestSubmit()}});$('clear').addEventListener('click',resetChat);$('newChat').addEventListener('click',resetChat);function resetChat(){$('chat').innerHTML='';const w=document.createElement('div');w.className='welcome';w.id='welcome';w.innerHTML='<div class="welcome-icon">✳</div><h1>Halo, mau bahas<br><span>apa hari ini?</span></h1><p>Tulis apa pun yang ingin lo tanyakan. Pilih model AI favorit di menu.</p>'; $('chat').append(w);$('prompt').value='';$('prompt').style.height='auto';$('prompt').focus();}document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{ $('prompt').value=b.dataset.prompt;$('prompt').focus();}));render();
+</script></body>
+</html>
